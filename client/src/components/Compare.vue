@@ -4,13 +4,20 @@
             <h1>Home Value Visualization</h1>
         </header>
         <main>
-            <canvas id="myChart" width="400" height="400"></canvas>
+            <canvas id="myChart" width="400" height="200"></canvas>
         </main>
     </section>
 </template>
 
 <script>
+    import Chart from '../scripts/Chart.bundle.min.js'
+
     export default {
+        data() {
+            return {
+                chart: null
+            }
+        },
         mounted(){
             var ctx = document.getElementById('myChart').getContext('2d');
 
@@ -49,10 +56,10 @@
                         }]
                     }
                 }
-            });
-
-            console.log(myChart);
-        }
+            });     
+            
+            this.chart = myChart;
+        }        
     }
 </script>
 
