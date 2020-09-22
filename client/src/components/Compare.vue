@@ -1,10 +1,26 @@
 <template>
     <section class="h-100">
-        <header>
+        <header class="pt-5 pl-4 mb-5">
             <h1>Home Value Visualization</h1>
         </header>
         <main>
-            <canvas id="myChart" width="400" height="200"></canvas>
+            <div>
+                <canvas id="myChart" width="75"></canvas>
+            </div>
+            <div class="controls row no-gutters pl-3">
+                <div class="col-3">
+                    test
+                </div>
+                <div class="col-3">
+                    test
+                </div>
+                <div class="col-3">
+                    test
+                </div>
+                <div class="col-3">
+                    test
+                </div>
+            </div>
         </main>
     </section>
 </template>
@@ -18,10 +34,15 @@
                 chart: null
             }
         },
+        methods : {
+            getHouseValues(selection){
+                console.log(selection);
+            }
+        },
         mounted(){
             var ctx = document.getElementById('myChart').getContext('2d');
 
-            var myChart = new Chart(ctx, {
+            var myChart = new Chart(ctx, {                         
                 type: 'bar',
                 data: {
                     labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
@@ -29,12 +50,12 @@
                         label: '# of Votes',
                         data: [12, 19, 3, 5, 2, 3],
                         backgroundColor: [
-                            'rgba(255, 99, 132, 0.2)',
-                            'rgba(54, 162, 235, 0.2)',
-                            'rgba(255, 206, 86, 0.2)',
-                            'rgba(75, 192, 192, 0.2)',
-                            'rgba(153, 102, 255, 0.2)',
-                            'rgba(255, 159, 64, 0.2)'
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)'
                         ],
                         borderColor: [
                             'rgba(255, 99, 132, 1)',
@@ -48,10 +69,24 @@
                     }]
                 },
                 options: {
+                    legend: {
+                        labels: {
+                            fontColor: "black"
+                        }
+                    },
                     scales: {
                         yAxes: [{
                             ticks: {
-                                beginAtZero: true
+                                beginAtZero: true,
+                                fontColor: "black",
+                                fontSize: 18
+                            }
+                        }],
+                        xAxes: [{
+                            ticks: {
+                                beginAtZero: true,
+                                fontColor: "black",
+                                fontSize: 18
                             }
                         }]
                     }
@@ -68,6 +103,15 @@
         background-image: url('~@/assets/Abstract-Timekeeper.svg');
         background-size: cover;
     }
+        .section::before {
+            content: "";
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            bottom: 0px;
+            left: 0px;
+            background-color: rgba(0,0,0,.5);
+        }
     header h1 {
         color: white;
     }
