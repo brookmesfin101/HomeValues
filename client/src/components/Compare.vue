@@ -26,7 +26,8 @@
 </template>
 
 <script>
-    import Chart from '../scripts/Chart.bundle.min.js'
+    import Chart from '../scripts/Chart.bundle.min.js';
+    import axios from 'axios';
 
     export default {
         data() {
@@ -35,8 +36,20 @@
             }
         },
         methods : {
-            getHouseValues(selection){
-                console.log(selection);
+            getHouseValues(selection){                
+                var selectedIndex = document.getElementById(selection.currentTarget.id).value;
+
+                var order = selectedIndex.split("_")[0].toLowerCase();
+                var quantity = selectedIndex.split("_")[1];
+                console.log(`${order}, ${quantity}`);  
+                
+                axios.get(`/houses/${order}/${quantity}`)
+                    .then((res) => {
+                        console.log(res);
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
             }
         },
         mounted(){

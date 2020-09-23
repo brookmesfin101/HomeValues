@@ -6,4 +6,6 @@ const router = express.Router();
 
 router.get('/get-by-year', mainController.GetByYear);
 
+router.get('/houses/top/:quantity', mainController.GetTop);
+
 module.exports = router;
