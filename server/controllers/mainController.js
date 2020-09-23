@@ -1,4 +1,5 @@
 const HouseValue = require('../models/HouseValue');
+const sequelize = require('sequelize');
 
 exports.GetByYear = (req, res, next) => {    
     const year = req.query.year;
@@ -9,16 +10,20 @@ exports.GetByYear = (req, res, next) => {
 exports.GetTop = (req, res, next) => {        
     var quantity = req.params.quantity;
 
-    HouseValue.findAll({
+    HouseValue.findAll({              
         attributes: [
-            'State','Metro',`2016`
+            `State`,`Metro`,sequelize.fn('avg', `2016`)
         ],
         order: [
-            '2016'
+            [`2016`, 'DESC']
         ],
-        limit: quantity
-    }).then((res) => {
-        res.send(res.data);
+        group: [
+            `Metro`
+        ],
+        limit: parseInt(quantity)   
+    }).then((result) => {
+        res.send(result.data);
+        console.log(result)
     }).catch((err) => {
         console.log(err);
     })    

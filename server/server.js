@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 
 const Sequelize = require('sequelize').Sequelize;
-const dbConfig = require('./configs/db.config');
+const dbConfig = require('./configs/db.work.config');
 const HouseValue = require('./models/HouseValue');
 
 const mainRoutes = require('./routes/main');
