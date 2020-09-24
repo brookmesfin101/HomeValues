@@ -12,7 +12,7 @@ exports.GetTop = (req, res, next) => {
 
     HouseValue.findAll({              
         attributes: [
-            `State`,`Metro`,sequelize.fn('avg', `2016`)
+            `State`, `Metro`, [sequelize.fn('avg', sequelize.col('2016')), "y2016"]
         ],
         order: [
             [`2016`, 'DESC']

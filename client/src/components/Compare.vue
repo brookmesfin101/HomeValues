@@ -39,26 +39,57 @@
         methods : {
             getHouseValues(selection){                
                 var selectedIndex = document.getElementById(selection.currentTarget.id).value;
-                var config = axios.create({
-                    baseURL: 'https://localhost:8081'
-                });
 
                 var order = selectedIndex.split("_")[0].toLowerCase();
-                var quantity = selectedIndex.split("_")[1];
-                console.log(`${order}, ${quantity}`);  
+                var quantity = selectedIndex.split("_")[1];                
                 
-                config.get(`/houses/${order}/${quantity}`)
-                    .then((res) => {
-                        console.log(res);
+                this.axiosConfig.get(`/houses/${order}/${quantity}`)
+                    .then((res) => {                        
+                        this.setUpChart(res);
                     })
                     .catch((err) => {
                         console.log(err);
                     });
+            },
+            setUpChart(data){     
+                data.data.sort((a, b) => {
+                    if(a["y2016"] > b["y2016"]){ 
+                        return -1;
+                    } else {
+                        return 1;
+                    }
+                    
+                });
+                
+                console.log(this.chart);
+                this.chart.data.datasets[0].data = [];
+                this.chart.data.datasets[0].backgroundColor = [];
+                this.chart.data.datasets[0].borderColor = [];
+                this.chart.data.labels = [];
+
+                data.data.forEach(el => {
+                    this.chart.data.datasets[0].data.push(el["y2016"]);
+                    this.chart.data.labels.push(el["Metro"]);
+                    this.chart.data.datasets[0].backgroundColor.push(this.randomColorGenerator());
+                    this.chart.data.datasets[0].borderColor.push(this.randomColorGenerator());
+                });
+                
+                this.chart.update();
+                this.randomColorGenerator();
+            },
+            randomColorGenerator(){
+                var color1 = (Math.random() * 255).toString();
+                var color2 = (Math.random() * 255).toString();
+                var color3 = (Math.random() * 255).toString();
+                
+                var color = `rgba(${color1}, ${color2}, ${color3}, 0.6)`;
+
+                return color;
             }
         },
         mounted(){
             var config = axios.create({
-                baseURL: 'https://localhost:8081'
+                baseURL: 'http://localhost:8081'
             });
             this.axiosConfig = config;
 
@@ -69,7 +100,7 @@
                 data: {
                     labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
                     datasets: [{
-                        label: '# of Votes',
+                        label: 'House Values',
                         data: [12, 19, 3, 5, 2, 3],
                         backgroundColor: [
                             'rgba(255, 99, 132, 0.6)',
