@@ -22,8 +22,7 @@ exports.GetTop = (req, res, next) => {
         ],
         limit: parseInt(quantity)   
     }).then((result) => {
-        res.send(result.data);
-        console.log(result)
+        res.send(result);        
     }).catch((err) => {
         console.log(err);
     })    

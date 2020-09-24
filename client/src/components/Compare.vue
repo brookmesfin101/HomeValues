@@ -32,18 +32,22 @@
     export default {
         data() {
             return {
-                chart: null
+                chart: null,
+                axiosConfig: null
             }
         },
         methods : {
             getHouseValues(selection){                
                 var selectedIndex = document.getElementById(selection.currentTarget.id).value;
+                var config = axios.create({
+                    baseURL: 'https://localhost:8081'
+                });
 
                 var order = selectedIndex.split("_")[0].toLowerCase();
                 var quantity = selectedIndex.split("_")[1];
                 console.log(`${order}, ${quantity}`);  
                 
-                axios.get(`/houses/${order}/${quantity}`)
+                config.get(`/houses/${order}/${quantity}`)
                     .then((res) => {
                         console.log(res);
                     })
@@ -53,6 +57,11 @@
             }
         },
         mounted(){
+            var config = axios.create({
+                baseURL: 'https://localhost:8081'
+            });
+            this.axiosConfig = config;
+
             var ctx = document.getElementById('myChart').getContext('2d');
 
             var myChart = new Chart(ctx, {                         
