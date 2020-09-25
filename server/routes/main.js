@@ -8,4 +8,6 @@ router.get('/get-by-year', mainController.GetByYear);
 
 router.get('/houses/top/:quantity', mainController.GetTop);
 
+router.get('/houses/bottom/:quantity', mainController.GetBottom);
+
 module.exports = router;

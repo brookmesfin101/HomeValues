@@ -1,25 +1,11 @@
 <template>
     <section class="h-100">
-        <header class="pt-5 pl-4 mb-5">
+        <header class="pt-5 pl-5 mb-5">
             <h1>Home Value Visualization</h1>
         </header>
         <main>
             <div>
                 <canvas id="myChart" width="75"></canvas>
-            </div>
-            <div class="controls row no-gutters pl-3">
-                <div class="col-3">
-                    test
-                </div>
-                <div class="col-3">
-                    test
-                </div>
-                <div class="col-3">
-                    test
-                </div>
-                <div class="col-3">
-                    test
-                </div>
             </div>
         </main>
     </section>
@@ -44,34 +30,42 @@
                 var quantity = selectedIndex.split("_")[1];                
                 
                 this.axiosConfig.get(`/houses/${order}/${quantity}`)
-                    .then((res) => {                        
-                        this.setUpChart(res);
+                    .then((res) => {       
+                        order == "top" ? this.setUpChart(res.data, "MostToLeast") : this.setUpChart(res.data, "LeastToMost");                        
                     })
                     .catch((err) => {
                         console.log(err);
                     });
             },
-            setUpChart(data){     
-                data.data.sort((a, b) => {
-                    if(a["y2016"] > b["y2016"]){ 
-                        return -1;
-                    } else {
-                        return 1;
-                    }
-                    
-                });
-                
-                console.log(this.chart);
+            setUpChart(data, sortOrder){    
+                if(sortOrder == "MostToLeast"){
+                    data.sort((a, b) => {
+                        if(a["y2016"] > b["y2016"]){ 
+                            return -1;
+                        } else {
+                            return 1;
+                        }                    
+                    });
+                } else {
+                    data.sort((a, b) => {
+                        if(a["y2016"] > b["y2016"]){ 
+                            return 1;
+                        } else {
+                            return -1;
+                        }                    
+                    });
+                }                
+                                
                 this.chart.data.datasets[0].data = [];
                 this.chart.data.datasets[0].backgroundColor = [];
                 this.chart.data.datasets[0].borderColor = [];
                 this.chart.data.labels = [];
 
-                data.data.forEach(el => {
+                data.forEach(el => {
                     this.chart.data.datasets[0].data.push(el["y2016"]);
-                    this.chart.data.labels.push(el["Metro"]);
+                    this.chart.data.labels.push(`${el["Metro"]}, ${el["State"]}`);
                     this.chart.data.datasets[0].backgroundColor.push(this.randomColorGenerator());
-                    this.chart.data.datasets[0].borderColor.push(this.randomColorGenerator());
+                    this.chart.data.datasets[0].borderColor.push("light-gray");
                 });
                 
                 this.chart.update();
@@ -122,7 +116,13 @@
                     }]
                 },
                 options: {
+                    title: {
+                        display: true,
+                        text: "Top 20 Most Expensive Metro Areas",
+                        fontSize: 20
+                    },
                     legend: {
+                        display: false,
                         labels: {
                             fontColor: "black"
                         }
@@ -131,21 +131,38 @@
                         yAxes: [{
                             ticks: {
                                 beginAtZero: true,
-                                fontColor: "black",
+                                fontColor: "rgb(94 94 94)",
+                                fontSize: 13,
+                                callback: function(value) {
+                                    if(parseInt(value) >= 1000){
+                                    return '$' + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                    } else {
+                                    return '$' + value;
+                                    }
+                                }
+                            },
+                            scaleLabel: {
+                                display: true,
+                                labelString: "House Value in ($)",
                                 fontSize: 18
                             }
                         }],
                         xAxes: [{
                             ticks: {
                                 beginAtZero: true,
-                                fontColor: "black",
+                                fontColor: "rgb(94 94 94)",
+                                fontSize: 13
+                            },
+                            scaleLabel: {
+                                display: true,
+                                labelString: "Metro Area",
                                 fontSize: 18
                             }
                         }]
                     }
                 }
             });     
-            
+            console.log(myChart);
             this.chart = myChart;
         }        
     }
@@ -153,7 +170,7 @@
 
 <style scoped>
     section {
-        background-image: url('~@/assets/Abstract-Timekeeper.svg');
+        background-image: url('~@/assets/Wintery-Sunburst.svg');
         background-size: cover;
     }
         .section::before {
@@ -166,6 +183,7 @@
             background-color: rgba(0,0,0,.5);
         }
     header h1 {
-        color: white;
+        color: rgb(94 94 94);
+        font-size: 4rem;
     }
 </style>
