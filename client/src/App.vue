@@ -6,9 +6,8 @@
           <ul class="list-group nav-list text-right w-75">
             <li v-on:click="changePage('Welcome')" v-bind:class="{ 'nav-list-item__active': showPage == 'Welcome' }" class="nav-list-item  pb-2"><h3>Welcome</h3></li>
             <li v-on:click="changePage('Compare')" v-bind:class="{ 'nav-list-item__active': showPage == 'Compare' }" class="nav-list-item pb-2 pt-3"><h3>Compare Home Values</h3></li>
-            <ul v-show="showPage == 'Compare'" class="list-group text-right">
-              <select v-on:change="setCompareFilter($event)" class="form-control" name="basic_filter" id="basic_filter">
-                <option>Select Filter</option>
+            <ul v-show="showPage == 'Compare'" v-on: class="list-group text-right">
+              <select v-on:change="setCompareFilter($event)" class="form-control" name="basic_filter" id="basic_filter">                
                 <option value="TOP_20">Top 20 Most Expensive</option>
                 <option value="BOTTOM_20">Top 20 Least Expensive</option>                                
               </select>
@@ -27,29 +26,33 @@
 </template>
 
 <script>
-import Welcome from './components/Welcome';
-import Compare from './components/Compare';
+  import Welcome from './components/Welcome';
+  import Compare from './components/Compare';
 
-export default {
-  name: 'App',
-  data(){
-    return{
-      showPage: "Welcome"
-    }    
-  },
-  components: {
-    Welcome,
-    Compare
-  },
-  methods: {
-    changePage(pageName){
-      this.showPage = pageName;
+  export default {
+    name: 'App',
+    data(){
+      return{
+        showPage: "Welcome"
+      }    
     },
-    setCompareFilter(){
-      this.$refs.compare_component.getHouseValues(event);
+    components: {
+      Welcome,
+      Compare
+    },
+    methods: {
+      changePage(pageName){
+        this.showPage = pageName;  
+
+        if(pageName == 'Compare'){
+          this.$refs.compare_component.getHouseValues(null, 'basic_filter');
+        }
+      },
+      setCompareFilter(){
+        this.$refs.compare_component.getHouseValues(event);
+      }
     }
   }
-}
 </script>
 
 <style>
@@ -67,6 +70,7 @@ nav {
 .nav-list-item {
   border-bottom: 1px solid #f7a6f7;
   color: #f7a6f7;
+  cursor: pointer;
 } 
   .nav-list-item__active {
     border-bottom: 1px solid white;
@@ -74,7 +78,7 @@ nav {
   } 
   .nav-list-item:hover {
     color: white;
-    cursor: pointer;
+    
     border-bottom: 1px solid white;
   }
 </style>

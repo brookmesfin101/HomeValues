@@ -23,21 +23,21 @@
             }
         },
         methods : {
-            getHouseValues(selection){                
-                var selectedIndex = document.getElementById(selection.currentTarget.id).value;
+            getHouseValues(event, id){             
+                var selectedIndex = id == null ? document.getElementById(event.currentTarget.id).value : document.getElementById(id).value;
 
                 var order = selectedIndex.split("_")[0].toLowerCase();
                 var quantity = selectedIndex.split("_")[1];                
                 
                 this.axiosConfig.get(`/houses/${order}/${quantity}`)
                     .then((res) => {       
-                        order == "top" ? this.setUpChart(res.data, "MostToLeast") : this.setUpChart(res.data, "LeastToMost");                        
+                        order == "top" ? this.updateChart(res.data, "MostToLeast") : this.updateChart(res.data, "LeastToMost");                        
                     })
                     .catch((err) => {
                         console.log(err);
                     });
             },
-            setUpChart(data, sortOrder){    
+            updateChart(data, sortOrder){    
                 if(sortOrder == "MostToLeast"){
                     data.sort((a, b) => {
                         if(a["y2016"] > b["y2016"]){ 
@@ -79,91 +79,108 @@
                 var color = `rgba(${color1}, ${color2}, ${color3}, 0.6)`;
 
                 return color;
-            }
-        },
-        mounted(){
-            var config = axios.create({
-                baseURL: 'http://localhost:8081'
-            });
-            this.axiosConfig = config;
+            },
+            initChart(){
+                var ctx = document.getElementById('myChart').getContext('2d');
 
-            var ctx = document.getElementById('myChart').getContext('2d');
-
-            var myChart = new Chart(ctx, {                         
-                type: 'bar',
-                data: {
-                    labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-                    datasets: [{
-                        label: 'House Values',
-                        data: [12, 19, 3, 5, 2, 3],
-                        backgroundColor: [
-                            'rgba(255, 99, 132, 0.6)',
-                            'rgba(54, 162, 235, 0.6)',
-                            'rgba(255, 206, 86, 0.6)',
-                            'rgba(75, 192, 192, 0.6)',
-                            'rgba(153, 102, 255, 0.6)',
-                            'rgba(255, 159, 64, 0.6)'
-                        ],
-                        borderColor: [
-                            'rgba(255, 99, 132, 1)',
-                            'rgba(54, 162, 235, 1)',
-                            'rgba(255, 206, 86, 1)',
-                            'rgba(75, 192, 192, 1)',
-                            'rgba(153, 102, 255, 1)',
-                            'rgba(255, 159, 64, 1)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    title: {
-                        display: true,
-                        text: "Top 20 Most Expensive Metro Areas",
-                        fontSize: 20
+                var myChart = new Chart(ctx, {                         
+                    type: 'bar',
+                    data: {
+                        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                        datasets: [{
+                            label: 'House Values',
+                            data: [12, 19, 3, 5, 2, 3],
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.6)',
+                                'rgba(54, 162, 235, 0.6)',
+                                'rgba(255, 206, 86, 0.6)',
+                                'rgba(75, 192, 192, 0.6)',
+                                'rgba(153, 102, 255, 0.6)',
+                                'rgba(255, 159, 64, 0.6)'
+                            ],
+                            borderColor: [
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 206, 86, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(153, 102, 255, 1)',
+                                'rgba(255, 159, 64, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
                     },
-                    legend: {
-                        display: false,
-                        labels: {
-                            fontColor: "black"
-                        }
-                    },
-                    scales: {
-                        yAxes: [{
-                            ticks: {
-                                beginAtZero: true,
-                                fontColor: "rgb(94 94 94)",
-                                fontSize: 13,
-                                callback: function(value) {
-                                    if(parseInt(value) >= 1000){
-                                    return '$' + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                    options: {
+                        title: {
+                            display: true,
+                            text: "Top 20 Most Expensive Metro Areas",
+                            fontSize: 20
+                        },
+                        tooltips: {
+                            callbacks: {
+                                label: function(tooltipItem, data){
+                                    var value = data.datasets[0].data[tooltipItem.index];                                    
+                                    if(parseInt(value) >= 1000){                                        
+                                        return '$' + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
                                     } else {
-                                    return '$' + value;
+                                        return '$' + value;
                                     }
                                 }
-                            },
-                            scaleLabel: {
-                                display: true,
-                                labelString: "House Value in ($)",
-                                fontSize: 18
                             }
-                        }],
-                        xAxes: [{
-                            ticks: {
-                                beginAtZero: true,
-                                fontColor: "rgb(94 94 94)",
-                                fontSize: 13
-                            },
-                            scaleLabel: {
-                                display: true,
-                                labelString: "Metro Area",
-                                fontSize: 18
+                        },
+                        legend: {
+                            display: false,
+                            labels: {
+                                fontColor: "black"
                             }
-                        }]
+                        },
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true,
+                                    fontColor: "rgb(94 94 94)",
+                                    fontSize: 13,
+                                    callback: function(value) {
+                                        if(parseInt(value) >= 1000){
+                                            return '$' + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                        } else {
+                                            return '$' + value;
+                                        }
+                                    }
+                                },
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: "House Value in ($)",
+                                    fontSize: 18
+                                }
+                            }],
+                            xAxes: [{
+                                ticks: {
+                                    beginAtZero: true,
+                                    fontColor: "rgb(94 94 94)",
+                                    fontSize: 13
+                                },
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: "Metro Area",
+                                    fontSize: 18
+                                }
+                            }]
+                        }
                     }
+                });     
+                
+                this.chart = myChart;
+            },
+            initAxios(){
+                var config = axios.create({
+                    baseURL: 'http://localhost:8081'
+                });
+                this.axiosConfig = config;
                 }
-            });     
-            console.log(myChart);
-            this.chart = myChart;
+        },
+        mounted(){            
+            this.initAxios();
+            this.initChart();
         }        
     }
 </script>
