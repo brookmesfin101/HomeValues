@@ -19,7 +19,8 @@
         data() {
             return {
                 chart: null,
-                axiosConfig: null
+                axiosConfig: null,
+                chartTitle: null
             }
         },
         methods : {
@@ -27,17 +28,65 @@
                 var selectedIndex = id == null ? document.getElementById(event.currentTarget.id).value : document.getElementById(id).value;
 
                 var order = selectedIndex.split("_")[0].toLowerCase();
-                var quantity = selectedIndex.split("_")[1];                
+                var quantity = selectedIndex.split("_")[1];                                
                 
                 this.axiosConfig.get(`/houses/${order}/${quantity}`)
                     .then((res) => {       
-                        order == "top" ? this.updateChart(res.data, "MostToLeast") : this.updateChart(res.data, "LeastToMost");                        
+                        if(order == "top"){
+                            this.chartTitle = `${quantity} Most Expensive Metros Areas`;
+                            this.updateBarGraph(res.data, "MostToLeast");                            
+                        } else {
+                            this.chartTitle = `${quantity} Least Expensive Metros Areas`;
+                            this.updateBarGraph(res.data, "LeastToMost"); 
+                        }
                     })
                     .catch((err) => {
                         console.log(err);
                     });
             },
-            updateChart(data, sortOrder){    
+            getHouseValueByState(event, id){
+                var stateSelect = id == null ? document.getElementById(event.currentTarget.id) : document.getElementById(id);
+                var stateCode = stateSelect.value;
+                var stateName = stateSelect[stateSelect.selectedIndex].text;
+                var order = ("TOP").toLowerCase();                
+                var quantity = 20;
+
+                this.axiosConfig.get(`/houses/${stateCode}/${order}/${quantity}`)
+                    .then((res) => {
+                        if(order == "top"){
+                            this.chartTitle = `House Values By Metro Area in ${stateName}`;
+                            this.updateBarGraph(res.data, "MostToLeast");                            
+                        } else {
+                            this.chartTitle = `${quantity} Least Expensive Metros Areas`;
+                            this.updateBarGraph(res.data, "LeastToMost"); 
+                        }
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
+            },
+            getHouseValueOverYears(event, id){
+                var stateSelect = id == null ? document.getElementById(event.currentTarget.id) : document.getElementById(id);
+                var stateCode = stateSelect.value;
+                var stateName = stateSelect[stateSelect.selectedIndex].text;
+                var order = ("TOP").toLowerCase();                
+                var quantity = 20;
+
+                this.axiosConfig.get(`/houses/by-year/${stateCode}/${order}/${quantity}`)
+                    .then((res) => {
+                        if(order == "top"){
+                            this.chartTitle = `House Values Over the Years in ${stateName}`;
+                            this.updateWithLineGraph(res.data);
+                        }
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    });
+            },
+            updateWithLineGraph(data){
+                console.log(data);
+            },
+            updateBarGraph(data, sortOrder){    
                 if(sortOrder == "MostToLeast"){
                     data.sort((a, b) => {
                         if(a["y2016"] > b["y2016"]){ 
@@ -60,6 +109,7 @@
                 this.chart.data.datasets[0].backgroundColor = [];
                 this.chart.data.datasets[0].borderColor = [];
                 this.chart.data.labels = [];
+                this.chart.options.title.text = this.chartTitle;
 
                 data.forEach(el => {
                     this.chart.data.datasets[0].data.push(el["y2016"]);
@@ -112,7 +162,7 @@
                     options: {
                         title: {
                             display: true,
-                            text: "Top 20 Most Expensive Metro Areas",
+                            text: this.chartTitle,
                             fontSize: 20
                         },
                         tooltips: {
